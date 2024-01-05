@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 
 	"waizly-tech-test/controllers"
-	// "backend/middlewares"
+	"waizly-tech-test/middlewares"
 
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
@@ -31,6 +31,15 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	r.POST("/register", controllers.Register)
 	r.POST("/login", controllers.Login)
+
+	// TASK API
+	r.GET("/task", controllers.GetAllTask)
+	r.GET("task/:customer_id", controllers.GetTaskByCustomerId)
+	taskMiddlewareRoute := r.Group("/task")
+	taskMiddlewareRoute.Use(middlewares.JwtAuthMiddleware())
+	taskMiddlewareRoute.POST("/", controllers.CreateTask)
+	taskMiddlewareRoute.PATCH("/:id", controllers.UpdateTask)
+	taskMiddlewareRoute.DELETE("/:id", controllers.DeleteTask)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

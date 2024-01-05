@@ -30,9 +30,24 @@ func main() {
 			log.Fatal("Error loading .env file")
 		}
 	}
-	// programmatically set swagger info
-	docs.SwaggerInfo.Title = "Swagger Example API"
-	docs.SwaggerInfo.Description = "This is a sample server Movie."
+
+	// tokenString := token.ExtractToken(c)
+	// fmt.Println(tokenString)
+
+	// bearerToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MDQ0MTkzOTQsInVzZXJfaWQiOjJ9.B1KTe0DN8FtvsTorqPcuYi6_GQ6Kvfe1Nby3OVjU3Y4"
+	// splitToken := strings.Split(bearerToken, "Bearer ")
+	// if len(splitToken) != 2 {
+	// 	fmt.Println("jeng jeng")
+	// }
+	// fmt.Println(splitToken[1])
+	// bearerToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MDQ0MTkzOTQsInVzZXJfaWQiOjJ9.B1KTe0DN8FtvsTorqPcuYi6_GQ6Kvfe1Nby3OVjU3Y4"
+	// if len(strings.Split(bearerToken, " ")) == 2 {
+	// 	fmt.Println(strings.Split(bearerToken, " ")[1])
+	// }
+	// fmt.Println("jeng jeng")
+
+	docs.SwaggerInfo.Title = "Swagger wailzy tech test API"
+	docs.SwaggerInfo.Description = "This is a wailzy tech test."
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}

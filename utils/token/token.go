@@ -45,15 +45,48 @@ func TokenValid(c *gin.Context) error {
 }
 
 func ExtractToken(c *gin.Context) string {
-	token := c.Query("token")
-	if token != "" {
-		return token
+	// token := c.Query("token")
+	// if token != "" {
+	// 	return token
+	// }
+
+	// bearerToken := c.Request.Header.Get("Authorization")
+	// splitToken := strings.Split(bearerToken, "Bearer ")
+	// if len(splitToken) != 2 {
+	// 	return ""
+	// }
+	// return splitToken[1]
+
+	// authHeader := c.GetHeader("Authorization")
+	// if authHeader == "" {
+	// 	return ""
+	// }
+
+	// tokenParts := strings.Split(authHeader, "Bearer ")
+	// if len(tokenParts) != 2 {
+	// 	return ""
+	// }
+
+	// return strings.TrimSpace(tokenParts[1])
+
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return ("Authorization header missing")
 	}
-	bearerToken := c.Request.Header.Get("Authorization")
-	if len(strings.Split(bearerToken, " ")) == 2 {
-		return strings.Split(bearerToken, " ")[1]
+
+	// Check if the header starts with "Bearer "
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return ("Invalid token format: Bearer token expected")
 	}
-	return ""
+
+	// Extract the token after "Bearer "
+	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+	if token == "" {
+		return ("Token value is empty")
+	}
+
+	return token
+
 }
 
 func ExtractTokenID(c *gin.Context) (uint, error) {
@@ -61,6 +94,7 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	tokenString := ExtractToken(c)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			fmt.Println("ini dia errornya: ")
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(API_SECRET), nil
@@ -70,11 +104,11 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
-		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
+		customer_id, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
 		if err != nil {
 			return 0, err
 		}
-		return uint(uid), nil
+		return uint(customer_id), nil
 	}
 	return 0, nil
 }

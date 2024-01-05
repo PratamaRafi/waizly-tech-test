@@ -14,11 +14,12 @@ import (
 type (
 	// customer
 	Customer struct {
-		ID        uint      `gorm:"primary_key" json:"id"`
-		Name      string    `json:"name"`
-		Username  string    `gorm:"not null;unique" json:"username"`
-		Email     string    `gorm:"not null;unique" json:"email"`
-		Password  string    `gorm:"not null;" json:"password"`
+		ID        uint   `gorm:"primary_key" json:"id"`
+		Name      string `json:"name"`
+		Username  string `gorm:"not null;unique" json:"username"`
+		Email     string `gorm:"not null;unique" json:"email"`
+		Password  string `gorm:"not null;" json:"password"`
+		Tasks     []Task
 		CreatedAt time.Time `json:"created_at"`
 		UpdatedAt time.Time `json:"updated_at"`
 	}

@@ -3,9 +3,13 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"waizly-tech-test/models"
+	"waizly-tech-test/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +23,8 @@ type LoginInput struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+var API_SECRET = utils.Getenv("API_SECRET", "initokenrafi")
 
 // Register godoc
 // @Summary Register a user.
@@ -42,6 +48,7 @@ func Register(c *gin.Context) {
 	u.Username = input.Username
 	u.Email = input.Email
 	u.Password = input.Password
+	u.Name = strings.ToUpper(input.Username)
 
 	_, err := u.SaveUser(db)
 
@@ -80,7 +87,7 @@ func Login(c *gin.Context) {
 	u.Username = input.Username
 	u.Password = input.Password
 
-	token, err := models.LoginCheck(u.Username, u.Password, db)
+	tokenauth, err := models.LoginCheck(u.Username, u.Password, db)
 
 	if err != nil {
 		fmt.Println(err)
@@ -88,10 +95,45 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user := map[string]string{
-		"username": u.Username,
-		"email":    u.Email,
+	// get customer ID from token
+	tokenString := tokenauth
+	if tokenString == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "login success", "user": user, "token": token})
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(API_SECRET), nil // Replace with your actual secret key
+	})
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	if !token.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	// Extract customer ID from the token claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	customer_id, ok := claims["user_id"].(float64)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	user := map[string]string{
+		"username":    u.Username,
+		"email":       u.Email,
+		"customer_id": strconv.FormatUint(uint64(customer_id), 10),
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "login success", "user": user, "token": tokenauth})
 }

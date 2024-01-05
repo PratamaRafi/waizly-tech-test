@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-
 	"waizly-tech-test/utils/token"
 
 	"github.com/gin-gonic/gin"

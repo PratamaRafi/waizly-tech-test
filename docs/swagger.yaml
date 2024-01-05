@@ -22,6 +22,32 @@ definitions:
     - password
     - username
     type: object
+  controllers.TaskInput:
+    properties:
+      description:
+        type: string
+      due_date:
+        type: string
+      is_done type:boolean:
+        type: boolean
+    type: object
+  models.Task:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      is_done type:boolean:
+        type: boolean
+      task_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -74,4 +100,64 @@ paths:
       summary: Register a user.
       tags:
       - Auth
+  /task:
+    get:
+      description: Get a list of Task.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+      summary: Get all Task.
+      tags:
+      - Task
+    post:
+      description: create new Task Task
+      parameters:
+      - description: the body to create new Task
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.TaskInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+      security:
+      - BearerToken: []
+      summary: Create Task
+      tags:
+      - Task
+  /task/{customer_id}:
+    get:
+      description: Get an Task by id.
+      parameters:
+      - description: Task id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: Get Task.
+      tags:
+      - Task
 swagger: "2.0"
