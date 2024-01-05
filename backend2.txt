@@ -1,0 +1,44 @@
+No.1
+SELECT * FROM employess
+
+No.2
+SELECT COUNT(employee_id) FROM employees WHERE job_title = 'Manager'
+
+No.3
+SELECT  name, salary FROM employees WHERE departement in ('Sales', 'Marketing')
+
+No.4
+SELECT AVG(salary) FROM employees WHERE joined_date::date > '2019-01-01'
+
+No.5
+SELECT e.name,SUM(sd.sales)  FROM employees e
+JOIN sales_data sd on sd.employee_id = e.employee_id
+GROUP BY e.name
+ORDER BY SUM(sd.sales) DESC
+LIMIT 5
+
+No.6
+SELECT name, salary, AVG(salary) OVER (PARTITION BY department) AS rata_rata_gaji
+FROM employees
+WHERE
+    AVG(salary) OVER (PARTITION BY department) >
+    (SELECT AVG(salary) FROM employees);
+
+
+No.7
+SELECT e.name, SUM(s.sales), RANK() OVER (ORDER BY SUM(s.sales) DESC) AS peringkat
+FROM employees e
+JOIN sales_data sd ON e.employee_id = sd.employee_id
+GROUP BYe.employee_id, e.employee_name;
+   
+
+No.8
+CREATE PROCEDURE GetEmployeeListByDepartment
+    @Department NVARCHAR(255)
+AS
+BEGIN
+    SELECT e.name, e.salary
+    FROM employees e
+    WHERE department = @Department;
+END;
+
